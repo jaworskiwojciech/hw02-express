@@ -5,11 +5,12 @@ const contactsPath = path.join(__dirname, "./contacts.json");
 
 const listContacts = async () => {
   try {
-    const response = await fs.readFile(contactsPath);
+    const response = await fs.readFile(contactsPath, "utf-8");
     const contacts = JSON.parse(response);
     return contacts;
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
+    throw error;
   }
 };
 
