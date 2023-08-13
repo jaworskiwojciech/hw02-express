@@ -12,7 +12,7 @@ const { schemaAdd, schemaUpdate } = require("../../validation/validation");
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
-  const contacts = listContacts();
+  const contacts = await listContacts();
   res.status(200).json({ message: contacts });
 });
 
