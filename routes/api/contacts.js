@@ -19,16 +19,19 @@ router.get("/", async (req, res, next) => {
 router.get("/:contactId", async (req, res, next) => {
   const { contactId } = req.params;
   const response = await getContactById(contactId);
-  response
-    ? res.status(200).json({ message: response })
-    : res.status(404).json({ message: "Not found" });
+
+  if (response !== null) {
+    res.status(200).json({ message: response });
+  } else {
+    res.status(404).json({ message: "Not found" });
+  }
 });
 
 router.post("/", async (req, res, next) => {
   try {
     const body = await schemaAdd.validateAsync(req.body);
     const response = await addContact(body);
-    res.status(200).json({ message: response });
+    res.status(200).json({ message: "Contact added successfully!" });
   } catch (error) {
     res.status(400).json({ message: "missing required name - field" });
     console.log(error);
@@ -48,9 +51,11 @@ router.put("/:contactId", async (req, res, next) => {
     const { contactId } = req.params;
     const updatedContact = await schemaUpdate.validateAsync(req.body);
     const response = await updateContact(contactId, updatedContact);
-    response
-      ? res.status(200).json({ message: response })
-      : res.status(404).json({ message: "Not found" });
+    if (response === "Contact updated!") {
+      res.status(200).json({ message: "Contact updated!" });
+    } else if (response === "Not found") {
+      res.status(404).json({ message: "Contact not found!" });
+    }
   } catch (error) {
     res.status(400).json({ message: "Missing fields" });
     console.log(error);
