@@ -17,10 +17,8 @@ const listContacts = async () => {
 const getContactById = async (contactId) => {
   try {
     const contacts = await listContacts();
-    const matchedContact = contacts.filter(
-      (contact) => contact.id === contactId
-    );
-    return matchedContact;
+    const matchedContact = contacts.find((contact) => contact.id === contactId);
+    return matchedContact || null;
   } catch (error) {
     console.log(error.message);
   }
@@ -39,8 +37,10 @@ const removeContact = async (contactId) => {
       );
       fs.writeFile(contactsPath, JSON.stringify(restOfContacts, null, 2));
       console.log(`${name} has deleted!`);
+      return true;
     } else {
       console.log(`Contact with ID ${contactId} not found.`);
+      return false;
     }
   } catch (error) {
     console.log(error.message);
@@ -55,7 +55,9 @@ const addContact = async (body) => {
       const newContact = { id: nanoid(), name, email, phone };
       contacts.push(newContact);
       await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+      return true;
     }
+    return false;
   } catch (error) {
     console.log(error.message);
   }
@@ -68,10 +70,11 @@ const updateContact = async (contactId, body) => {
       (contact) => contact.id === contactId
     );
     if (indexToUpdate === -1) {
-      return;
+      return "Not found";
     } else {
       contacts[indexToUpdate] = { ...contacts[indexToUpdate], ...body };
       fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+      return "Contact updated!"
     }
   } catch (error) {
     console.log(error.message);
