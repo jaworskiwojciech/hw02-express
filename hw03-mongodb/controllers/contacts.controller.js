@@ -21,11 +21,11 @@ const getById = async (req, res, next) => {
     const { id } = req.params;
     const results = await contactsService.getOne(id);
     if (!results) {
-      res.status(404).json({
+      return res.status(404).json({
         status: "not-found",
         code: 404,
         data: {
-          message: error.message,
+          message: "Contact not found",
         },
       });
     }
@@ -44,7 +44,6 @@ const getById = async (req, res, next) => {
         message: error.message,
       },
     });
-    console.error(error);
     next(error);
   }
 };
@@ -106,7 +105,7 @@ const updateFavorite = async (req, res, next) => {
 const remove = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const results = await contactsService.remove();
+    const results = await contactsService.remove(id);
     res.json({
       status: "success",
       code: 200,
