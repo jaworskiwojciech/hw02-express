@@ -5,7 +5,7 @@ const {
   removeContact,
   addContact,
   updateContact,
-} = require("../../models/contacts");
+} = require("../../models-hw02/contacts");
 
 const { schemaAdd, schemaUpdate } = require("../../validation/validation");
 
