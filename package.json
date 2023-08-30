@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "cross-env NODE_ENV=production node ./hw03-mongodb/app.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon ./hw03-mongodb/app.js",
+    "start": "cross-env NODE_ENV=production node ./hw04-auth/app.js",
+    "start:dev": "cross-env NODE_ENV=development nodemon ./hw04-auth/app.js",
     "lint": "eslint **/*.js",
     "lint:fix": "eslint --fix **/*.js"
   },
