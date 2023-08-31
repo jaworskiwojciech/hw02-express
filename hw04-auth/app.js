@@ -15,6 +15,7 @@ const connection = mongoose.connect(process.env.DATABASE_URL, {
 });
 
 app.use(express.json());
+require("./config/passport");
 app.use("/api", contactRoutes);
 app.use("/api/auth", authRoutes);
 
