@@ -57,7 +57,46 @@ const signup = async (req, res, next) => {
   }
 };
 
+const logout = async (req, res) => {
+  try {
+    if (!req.user || !req.user._id) {
+      return res.status(401).json({
+        status: "error",
+        code: 401,
+        message: "Unauthorized",
+        data: "Unauthorized",
+      });
+    }
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        code: 404,
+        message: "User not found!",
+        data: "Not Found",
+      });
+    }
+
+    user.token = null;
+
+    await user.save();
+
+    res.status(204).send();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: "error",
+      code: 500,
+      message: "Internal Server Error",
+      data: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   signin,
   signup,
+  logout,
 };
