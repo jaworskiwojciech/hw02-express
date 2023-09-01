@@ -3,8 +3,9 @@ const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const auth = require("../middlewares/auth");
 
-router.post("/signin", authController.signin);
+router.post("/login", authController.login);
 router.post("/signup", authController.signup);
 router.get("/logout/:id", auth, authController.logout);
+router.get("/current", auth, authController.current);
 
 module.exports = router;
