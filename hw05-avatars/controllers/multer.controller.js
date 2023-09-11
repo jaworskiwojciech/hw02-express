@@ -6,6 +6,8 @@ const User = require("../models/user.model");
 const tmpDir = path.join(process.cwd(), "public/tmp");
 const avatarsDir = path.join(process.cwd(), "public/avatars");
 
+fs.access(tmpDir).catch(() => fs.mkdir(tmpDir));
+
 const getFilenameWithSuffix = (originalname) => {
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e3);
   return uniqueSuffix + "-" + originalname;
@@ -14,16 +16,13 @@ const getFilenameWithSuffix = (originalname) => {
 const resizeAvatar = (fileName, avatarName) => {
   Jimp.read(fileName, function (err, test) {
     if (err) throw err;
-    test
-      .resize(250, 250)
-      .quality(100)
-      .write(avatarsDir + "/" + avatarName);
+    test.resize(250, 250).quality(100).write(path.join(avatarsDir, avatarName));
   });
 };
 
 const removeTmpFile = async (fileName) => {
   try {
-    await fs.unlink(path.join(fileName));
+    await fs.unlink(fileName);
   } catch (err) {
     console.error(err);
   }
@@ -31,7 +30,12 @@ const removeTmpFile = async (fileName) => {
 
 const updateAvatar = async (req, _, next, avatarName) => {
   try {
-    const avatarURL = req.get("host") + "/avatars/" + avatarName;
+    const avatarURL =
+      req.protocol +
+      "://" +
+      req.get("host").replace("localhost:3000", "") +
+      "/avatars/" +
+      avatarName;
     const { email } = req.user;
     const user = await User.findOne({ email });
     user.avatarURL = avatarURL;
@@ -49,29 +53,31 @@ const uploadAvatar = async (req, res, next) => {
   const fileName = path.join(tmpDir, filename);
   try {
     if (mimetype === "image/png" || mimetype === "image/jpg") {
+      await fs.rename(tempPathName, fileName);
+      const avatarName = getFilenameWithSuffix(originalname);
+      resizeAvatar(fileName, avatarName);
+      removeTmpFile(fileName);
+
+      const avatarURL = await updateAvatar(req, res, next, avatarName);
+      if (!avatarURL) {
+        throw requestError(400, "Something went wrong");
+      }
+
+      res.json({
+        description,
+        status: 200,
+        data: {
+          message: "File uploaded successfully",
+          avatarURL: avatarURL,
+        },
+      });
+    } else {
+      throw new Error("Invalid file type");
     }
-    await fs.rename(tempPathName, fileName);
   } catch (err) {
-    await fs.unlink(tempPathName);
-    console.error(err);
+    await removeTmpFile(tempPathName);
+    next(err);
   }
-  const avatarName = getFilenameWithSuffix(originalname);
-
-  resizeAvatar(fileName, avatarName);
-  removeTmpFile(fileName);
-
-  const avatarURL = await updateAvatar(req, res, next, avatarName);
-  if (!avatarURL) {
-    throw requestError(400, "Something went wrong");
-  }
-  res.json({
-    description,
-    status: 200,
-    data: {
-      message: "File uploaded successfully",
-      avatarURL: avatarURL,
-    },
-  });
 };
 
 module.exports = uploadAvatar;
