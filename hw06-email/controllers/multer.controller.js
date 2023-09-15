@@ -3,8 +3,8 @@ const fs = require("fs").promises;
 const Jimp = require("jimp");
 const User = require("../models/user.model");
 
-const tmpDir = path.join(process.cwd(), "/hw05-avatars/public/tmp");
-const avatarsDir = path.join(process.cwd(), "/hw05-avatars/public/avatars");
+const tmpDir = path.join(process.cwd(), "/hw06-email/public/tmp");
+const avatarsDir = path.join(process.cwd(), "/hw06-email/public/avatars");
 
 console.log(tmpDir);
 console.log(avatarsDir);
